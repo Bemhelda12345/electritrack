@@ -57,6 +57,7 @@ function updateNavigation(user) {
   const navAuth = document.getElementById("nav-auth");
   const navProfile = document.getElementById("nav-profile");
   const navDashboard = document.getElementById("nav-dashboard");
+  const navTrends = document.getElementById("nav-trends");
   
   if (user) {
     // User is authenticated
@@ -64,6 +65,7 @@ function updateNavigation(user) {
     navAuth.href = "#logout";
     navProfile.style.display = "inline";
     navDashboard.style.display = "inline";
+    navTrends.style.display = "inline";
     
     // Update brand to show user name
     const navBrand = document.querySelector(".nav-brand h1");
@@ -75,6 +77,7 @@ function updateNavigation(user) {
     navAuth.href = "#auth";
     navProfile.style.display = "none";
     navDashboard.style.display = "none";
+    navTrends.style.display = "none";
     
     // Reset brand
     document.querySelector(".nav-brand h1").innerHTML = "⚡ ElectriTrack";
@@ -98,6 +101,16 @@ function setupNavigation() {
     e.preventDefault();
     if (currentUser) {
       window.location.hash = "#profile";
+    } else {
+      window.location.hash = "#auth";
+    }
+  });
+
+  // Trends navigation
+  document.getElementById("nav-trends").addEventListener("click", (e) => {
+    e.preventDefault();
+    if (currentUser) {
+      window.location.hash = "#trends";
     } else {
       window.location.hash = "#auth";
     }
@@ -152,6 +165,16 @@ function handleRouteChange() {
         return; // Prevent further execution
       }
       break;
+    case "#trends":
+      if (currentUser) {
+        console.log("Rendering trends for authenticated user");
+        renderTrendsPageWrapper();
+      } else {
+        console.log("User not authenticated, redirecting to auth");
+        window.location.hash = "#auth";
+        return; // Prevent further execution
+      }
+      break;
     case "#auth":
       console.log("Rendering auth page");
       renderAuthPage();
@@ -190,6 +213,9 @@ function updateActiveNavigation(hash) {
     case "#profile":
       document.getElementById("nav-profile").classList.add("active");
       break;
+    case "#trends":
+      document.getElementById("nav-trends").classList.add("active");
+      break;
     case "#auth":
       document.getElementById("nav-auth").classList.add("active");
       break;
@@ -206,6 +232,18 @@ function renderDashboardPage() {
 function renderProfilePageWrapper() {
   currentPage = "profile";
   renderProfilePage();
+}
+
+// Render trends page wrapper
+function renderTrendsPageWrapper() {
+  currentPage = "trends";
+  // Import the trends view module and render it
+  import("./trends.js").then(module => {
+    module.renderTrendsView();
+  }).catch(error => {
+    console.error("Error loading trends module:", error);
+    window.location.hash = "#dashboard";
+  });
 }
 
 // Render authentication page
